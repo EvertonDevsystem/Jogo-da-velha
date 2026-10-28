@@ -2,6 +2,7 @@
 📘 Guia de Documentação do Código — Jogo da Velha Aurudo
 Desenvolvido por: Everton Eduardo Martin de Carvalho (1º D.S. — Etec Prof. José Carlos Seno Junior)
 
+
 1. 🏗️ Estrutura HTML (O Esqueleto da Aplicação)
 O código HTML é responsável por estruturar visualmente todos os elementos na tela, organizando o projeto em blocos lógicos:
 
@@ -17,8 +18,12 @@ O código HTML é responsável por estruturar visualmente todos os elementos na 
 
 <div class="board">: A grade estrutural contendo as 9 células (.cell) que formam o tabuleiro tradicional 3x3 do Jogo da Velha.
 
+
+
 2. 🎨 Estilos CSS & Variáveis Globais (:root)
 O CSS utiliza Variáveis CSS (--variavel) para permitir a troca dinâmica de temas de cores e o redimensionamento responsivo de forma simples:
+
+
 
 :root: Define a paleta de cores padrão inicial e medidas do layout, como:
 
@@ -36,6 +41,9 @@ body.theme-[nome]: Classes aplicadas dinamicamente ao elemento <body> (como them
 
 body.device-[tipo]: Classes que controlam a adaptação da interface para diferentes tamanhos de tela (desktop, tablet, mobile), alterando larguras máximas e fontes.
 
+
+
+
 3. ⚡ Lógica em JavaScript (O Cérebro do Jogo)
 O script JavaScript gerencia as regras do jogo, inteligência artificial, persistência de dados e efeitos visuais:
 
@@ -46,12 +54,17 @@ processarAutenticacao(): Valida os dados digitados no modal de login, cadastrand
 
 fazerLogout(): Encerra a sessão atual do jogador e limpa os campos de identificação.
 
+
+
 B. O Motor do Jogo e Turnos
 tabuleiro = [...]: Um vetor (array) com 9 posições que armazena o estado atual de cada célula ('', X ou O).
 
 lidarComClique(e): Captura o clique do usuário em uma célula do tabuleiro, verifica se a jogada é válida, reproduz o som de clique e atualiza o estado visual.
 
 verificarFimDeJogo(): Analisa após cada jogada se houve uma combinação vencedora com base nas condicoesVitoria, preenche o placar correspondente, dispara o efeito de confetes (canvas-confetti) e bloqueia o tabuleiro se o jogo acabar.
+
+
+
 
 C. Inteligência Artificial (Modo PvE)
 jogadaIA(): Controla a resposta automática do computador no modo contra a IA.
@@ -63,6 +76,8 @@ Fácil: Escolhe posições totalmente aleatórias.
 Médio e Normal: Realiza jogadas inteligentes para bloquear o oponente ou vencer quando há oportunidades diretas.
 
 Difícil: Adota estratégias defensivas e ofensivas avançadas (priorizando o centro e cantos do tabuleiro).
+
+
 
 D. Animações Dinâmicas em Canvas
 runAnimation(): Renderiza continuamente os efeitos visuais selecionados no fundo da tela através da API HTML5 Canvas:
