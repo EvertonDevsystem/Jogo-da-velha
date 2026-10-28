@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jogo da Velha — Completo</title>
+    <!-- Biblioteca de Confetes para a Vitória -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-color: #00ffcc;
+            --secondary-color: #00c6ff;
+            --card-bg: #1a233a;
+            --text-color: #ffffff;
+            --hover-color: #2a3b5f;
+            --max-container-width: 450px;
+            --cell-size: 100px;
+            --board-padding: 10px;
+            --board-gap: 8px;
+            --font-cell: 2.5rem;
+        }
+
+        /* Temas de Cores Avançados Clássicos */
+        body.theme-purple {
+            --bg-color: #120a1f;
+            --primary-color: #ff00ff;
+            --secondary-color: #9933ff;
+            --card-bg: #251238;
+            --hover-color: #3d1f5c;
+        }
+
+        body.theme-sakura {
+            --bg-color: #1a0f1a;
+            --primary-color: #ff69b4;
+            --secondary-color: #ff1493;
+            --card-bg: #2d162d;
+            --hover-color: #4a224a;
+        }
+
+        body.theme-fire {
+            --bg-color: #1a0b0b;
+            --primary-color: #ff4500;
+            --secondary-color: #ff8c00;
+            --card-bg: #2e1414;
+            --hover-color: #4d2222;
+        }
+
+        body.theme-minimal {
+            --bg-color: #121212;
+            --primary-color: #ffffff;
+            --secondary-color: #888888;
+            --card-bg: #1e1e1e;
+            --hover-color: #2d2d2d;
+        }
+
+        body.theme-light {
+            --bg-color: #f0f2f5;
+            --panel-bg: rgba(0, 0, 0, 0.04);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --primary-color: #00875a;
+            --secondary-color: #00b37e;
+            --card-bg: #ffffff;
+            --text-color: #1c1e21;
+            --hover-color: #e4e6eb;
+        }
+
+        /* Os 30 Novos Temas de Fundo */
+        body.theme-nebulosa { --bg-color: #0b001a; --primary-color: #9d4edd; --secondary-color: #c77dff; --card-bg: #1a0833; --hover-color: #2e124f; }
+        body.theme-floresta { --bg-color: #081c15; --primary-color: #2d6a4f; --secondary-color: #52b788; --card-bg: #112a20; --hover-color: #1b4332; }
+        body.theme-tropical { --bg-color: #2b1055; --primary-color: #f72585; --secondary-color: #7209b7; --card-bg: #3c166e; --hover-color: #561c9e; }
+        body.theme-oceano { --bg-color: #03045e; --primary-color: #0077b6; --secondary-color: #00b4d8; --card-bg: #023e8a; --hover-color: #0096c7; }
+        body.theme-vulcao { --bg-color: #1a0500; --primary-color: #d90429; --secondary-color: #ef233c; --card-bg: #370617; --hover-color: #6a040f; }
+        body.theme-cerejeira { --bg-color: #1b031b; --primary-color: #c9184a; --secondary-color: #ff758f; --card-bg: #380438; --hover-color: #590959; }
+        body.theme-deserto { --bg-color: #261c14; --primary-color: #c68b59; --secondary-color: #f3c68f; --card-bg: #3a2b20; --hover-color: #523c2d; }
+        body.theme-hacker { --bg-color: #000000; --primary-color: #00ff66; --secondary-color: #39ff14; --card-bg: #0a0a0a; --hover-color: #1a1a1a; }
+        body.theme-venus { --bg-color: #2d0c26; --primary-color: #b5179e; --secondary-color: #f72585; --card-bg: #45133c; --hover-color: #6e1d5e; }
+        body.theme-artico { --bg-color: #0b132b; --primary-color: #5bc0be; --secondary-color: #6fffe9; --card-bg: #1c2541; --hover-color: #3a506b; }
+        body.theme-gotico { --bg-color: #0d0d0d; --primary-color: #3a0ca3; --secondary-color: #4cc9f0; --card-bg: #1a1a1a; --hover-color: #262626; }
+        body.theme-retro { --bg-color: #240046; --primary-color: #ff007f; --secondary-color: #00f0ff; --card-bg: #3c096c; --hover-color: #5a189a; }
+        body.theme-chocolate { --bg-color: #1f130c; --primary-color: #8c5830; --secondary-color: #d4a373; --card-bg: #332217; --hover-color: #4d3322; }
+        body.theme-mentha { --bg-color: #0d1b1e; --primary-color: #20fc8f; --secondary-color: #00b4d8; --card-bg: #16262b; --hover-color: #223a40; }
+        body.theme-lavanda { --bg-color: #181223; --primary-color: #83769c; --secondary-color: #c5b9e0; --card-bg: #272038; --hover-color: #3d3254; }
+        body.theme-ouro { --bg-color: #111111; --primary-color: #b8860b; --secondary-color: #ffd700; --card-bg: #222222; --hover-color: #333333; }
+        body.theme-cobre { --bg-color: #1a1110; --primary-color: #b87333; --secondary-color: #e09f3e; --card-bg: #2b1c19; --hover-color: #402925; }
+        body.theme-ametista { --bg-color: #140821; --primary-color: #9932cc; --secondary-color: #da70d6; --card-bg: #221038; --hover-color: #361957; }
+        body.theme-esmeralda { --bg-color: #021c0e; --primary-color: #00a86b; --secondary-color: #50c878; --card-bg: #053018; --hover-color: #094d27; }
+        body.theme-safira { --bg-color: #02081d; --primary-color: #0f52ba; --secondary-color: #4169e1; --card-bg: #051438; --hover-color: #0b2259; }
+        body.theme-meteoro { --bg-color: #10101a; --primary-color: #483d8b; --secondary-color: #8a2be2; --card-bg: #1c1c2e; --hover-color: #2b2b45; }
+        body.theme-carbono { --bg-color: #161616; --primary-color: #333333; --secondary-color: #666666; --card-bg: #222222; --hover-color: #333333; }
+        body.theme-neonsunset { --bg-color: #1f0322; --primary-color: #ff4d6d; --secondary-color: #ffb703; --card-bg: #38073d; --hover-color: #570b61; }
+        body.theme-halloween { --bg-color: #140a00; --primary-color: #ff6b00; --secondary-color: #ffa200; --card-bg: #261400; --hover-color: #3d2000; }
+        body.theme-acid { --bg-color: #050801; --primary-color: #b5e853; --secondary-color: #39ff14; --card-bg: #0d1403; --hover-color: #182606; }
+        body.theme-eletrico { --bg-color: #000814; --primary-color: #001d3d; --secondary-color: #0077b6; --card-bg: #001229; --hover-color: #001f4d; }
+        body.theme-rosaneon { --bg-color: #1c0b14; --primary-color: #ff007f; --secondary-color: #ff70a6; --card-bg: #301323; --hover-color: #4d1e38; }
+        body.theme-caribenho { --bg-color: #041c1c; --primary-color: #008080; --secondary-color: #40e0d0; --card-bg: #083333; --hover-color: #0d4d4d; }
+        body.theme-bordo { --bg-color: #1a0008; --primary-color: #800020; --secondary-color: #b3003b; --card-bg: #330010; --hover-color: #4d0018; }
+        body.theme-tealdark { --bg-color: #051014; --primary-color: #004d61; --secondary-color: #00838f; --card-bg: #0a212b; --hover-color: #103342; }
+
+        /* Modos de Dispositivo / Extensão de Tela */
+        body.device-desktop {
+            --max-container-width: 650px;
+            --cell-size: 130px;
+            --board-padding: 15px;
+            --board-gap: 12px;
+            --font-cell: 3.5rem;
+        }
+
+        body.device-tablet {
+            --max-container-width: 520px;
+            --cell-size: 110px;
+            --board-padding: 12px;
+            --board-gap: 10px;
+            --font-cell: 3rem;
+        }
+
+        body.device-mobile {
+            --max-container-width: 380px;
+            --cell-size: 85px;
+            --board-padding: 8px;
+            --board-gap: 6px;
+            --font-cell: 2.2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 15px;
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas para Animações Dinâmicas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Elementos Fixos no Fundo */
+        .fixed-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .fixed-bg .fixed-item {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.15;
+            user-select: none;
+        }
+
+        .fixed-item:nth-child(1) { top: 8%; left: 8%; }
+        .fixed-item:nth-child(2) { top: 12%; right: 10%; }
+        .fixed-item:nth-child(3) { bottom: 15%; left: 12%; }
+        .fixed-item:nth-child(4) { bottom: 12%; right: 15%; }
+
+        /* Container para Imagens Customizadas por URL */
+        #customImagesContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .custom-fixed-img {
+            position: absolute;
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            opacity: 0.9;
+            animation: pulseImg 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px var(--primary-color));
+        }
+
+        @keyframes pulseImg {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        /* Modal de Autenticação / Login e Cadastro de Usuário */
+        #authModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 8, 15, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #authModal.hidden {
+            display: none !important;
+            pointer-events: none;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .auth-card h2 {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .auth-card p {
+            font-size: 0.85rem;
+            color: #a8a8b3;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .auth-input-group label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .auth-input-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .auth-input-group input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Top Bar e Menu */
+        .top-bar {
+            width: 100%;
+            max-width: var(--max-container-width);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            z-index: 10;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .menu-buttons-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .menu-icon-btn {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 1.3rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .menu-icon-btn:hover {
+            background: var(--border-color);
+        }
+
+        /* Menu Lateral (Drawer) */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            max-width: 310px;
+            height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -5px 0 20px rgba(0,0,0,0.6);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .menu-header h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .close-menu-btn {
+            background: rgba(255, 50, 50, 0.2);
+            border: 1px solid rgba(255, 50, 50, 0.4);
+            color: #ff6b6b;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .close-icon {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-section p {
+            font-size: 0.85rem;
+            color: #a8a8b3;
+            line-height: 1.3;
+        }
+
+        /* Botão Acordeão */
+        .accordion-btn {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+            text-align: left;
+        }
+
+        .accordion-btn:hover {
+            background: var(--border-color);
+        }
+
+        .accordion-btn span.arrow {
+            transition: transform 0.3s;
+            font-size: 0.8rem;
+        }
+
+        /* Conteúdo Expansível */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .accordion-content.open {
+            max-height: 400px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            overflow-y: auto;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .option-group input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .highlight-box {
+            background-color: rgba(0, 255, 204, 0.08);
+            border: 1px dashed var(--primary-color);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .side-menu select, .side-menu input[type="text"], .side-menu input[type="password"] {
+            width: 100%;
+            padding: 9px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .side-menu select:focus, .side-menu input[type="text"]:focus, .side-menu input[type="password"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Seletor de Cores RGB */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .color-picker-wrapper label {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 35px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Botões Gerais */
+        button.action-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #0072ff);
+            border: none;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            text-align: center;
+            width: 100%;
+        }
+
+        button.action-btn:hover {
+            filter: brightness(0.9);
+        }
+
+        button.action-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), #00b386);
+            color: #0b0f19;
+        }
+
+        /* Tabelas Top 10 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        th, td {
+            padding: 7px 5px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        th {
+            color: var(--secondary-color);
+        }
+
+        /* Componentes do Jogo */
+        .placar-container {
+            width: 100%;
+            max-width: var(--max-container-width);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        .placar-box {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-color);
+            opacity: 0.95;
+            text-align: center;
+            background: var(--panel-bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-container {
+            display: flex;
+            gap: 20px;
+            margin: 5px 0 15px 0;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-color);
+            opacity: 0.9;
+            z-index: 10;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, var(--cell-size));
+            grid-template-rows: repeat(3, var(--cell-size));
+            gap: var(--board-gap);
+            background-color: var(--card-bg);
+            padding: var(--board-padding);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .cell {
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-cell);
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s, transform 0.2s, font-size 0.3s;
+            user-select: none;
+        }
+
+        .cell:hover {
+            background-color: var(--hover-color);
+        }
+
+        .cell.winner-cell {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: filter 0.2s;
+            z-index: 10;
+        }
+
+        .restart-btn:hover {
+            filter: brightness(0.9);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Modal de Autenticação / Login e Cadastro de Usuário -->
+    <div id="authModal" class="hidden">
+        <div class="auth-card">
+            <h2 id="authTitle">🔑 Identificação do Jogador</h2>
+            <p id="authDesc">Crie sua conta ou faça login com seu nome e senha para registrar seus recordes:</p>
+            
+            <div class="auth-input-group">
+                <label>Nome de Usuário:</label>
+                <input type="text" id="inputAuthUser" placeholder="Ex: Everton">
+            </div>
+
+            <div class="auth-input-group">
+                <label>Senha:</label>
+                <input type="password" id="inputAuthPass" placeholder="Sua senha secreta">
+            </div>
+
+            <button class="action-btn" onclick="processarAutenticacao()" style="margin-top: 5px;" id="authSubmitBtn">Entrar / Criar Conta 🚀</button>
+        </div>
+    </div>
+
+    <!-- Container onde ficam as imagens customizadas por URL -->
+    <div id="customImagesContainer"></div>
+
+    <!-- Fundo Fixo (Estático) -->
+    <div class="fixed-bg">
+        <span class="fixed-item">🐼</span>
+        <span class="fixed-item">🐨</span>
+        <span class="fixed-item">🐯</span>
+        <span class="fixed-item">🦁</span>
+    </div>
+
+    <div class="top-bar">
+        <h1>🔥Jogo da Velha Aurudo🔥</h1>
+        <div class="menu-buttons-group">
+            <button class="menu-icon-btn" id="btnTop10Icon" onclick="toggleMenu('top10Menu')" title="Top 10 Recordes">🏆</button>
+            <button class="menu-icon-btn" onclick="toggleMenu('mainMenu')" title="Menu Principal">☰</button>
+        </div>
+    </div>
+
+    <!-- Menu Principal Estilo Drawer com Acordeões -->
+    <div id="mainMenu" class="side-menu">
+        <div class="menu-header">
+            <h2>Opções do Jogo</h2>
+            <button class="close-icon" onclick="toggleMenu('mainMenu')">✕</button>
+        </div>
+
+        <button class="close-menu-btn" onclick="toggleMenu('mainMenu')">Fechar Menu</button>
+
+        <div class="menu-section">
+            <p>Desenvolvido pelo aluno Everton Eduardo Martin de Carvalho 1 D.S da Etec Professor José Carlos Seno Junior 🚀</p>
+        </div>
+
+        <!-- Opção Top 10 Habilitar/Desabilitar -->
+        <div class="menu-section">
+            <div class="menu-options">
+                <button class="action-btn active" id="btnTop10Toggle" onclick="toggleTop10Feature()">🏆 Top 10: Habilitado</button>
+            </div>
+        </div>
+
+        <!-- Acordeão: Extensão de Tela / Dispositivo -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-dispositivo')">
+                <span>💻 Modo de Dispositivo (Tela)</span>
+                <span class="arrow" id="arrow-acc-dispositivo">▼</span>
+            </button>
+            <div id="acc-dispositivo" class="accordion-content">
+                <div style="margin-top: 4px;">
+                    <select id="seletorDispositivo" onchange="mudarDispositivo(this.value)">
+                        <option value="auto">Padrão (Automático)</option>
+                        <option value="desktop">Computador (Desktop)</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="mobile">Celular (Mobile)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Conta e Usuários -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-jogadores')">
+                <span>👥 Gerenciar Contas (Login)</span>
+                <span class="arrow" id="arrow-acc-jogadores">▼</span>
+            </button>
+            <div id="acc-jogadores" class="accordion-content">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div>
+                        <span style="font-size: 0.8rem; opacity: 0.8;">Jogador X (Logado):</span>
+                        <input type="text" id="nomeJogadorX" value="Jogador 1" readonly style="opacity: 0.7; cursor: not-allowed;">
+                    </div>
+                    <div>
+                        <span style="font-size: 0.8rem; opacity: 0.8;">Jogador O (Adversário):</span>
+                        <input type="text" id="nomeJogadorO" value="Adversário" oninput="atualizarNomesPlacar()">
+                    </div>
+                    <button class="action-btn" style="background: linear-gradient(135deg, #ff9900, #ff4d4d); margin-top: 4px;" onclick="fazerLogout()">Trocar de Usuário (Logout)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Configurações Gerais -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-geral')">
+                <span>⚙️ Preferências Gerais</span>
+                <span class="arrow" id="arrow-acc-geral">▼</span>
+            </button>
+            <div id="acc-geral" class="accordion-content">
+                <div class="option-group" style="padding: 5px 0;">
+                    <label>
+                        <input type="checkbox" id="toggleTimer" checked onchange="mudarTimer()"> 
+                        Habilitar Temporizador
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggleMusica" onchange="mudarMusica()"> 
+                        Habilitar Música de Fundo
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Imagem Fixa por URL -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-imagem')">
+                <span>🖼️ Imagem Fixa Personalizada</span>
+                <span class="arrow" id="arrow-acc-imagem">▼</span>
+            </button>
+            <div id="acc-imagem" class="accordion-content">
+                <div class="highlight-box">
+                    <label style="margin-bottom: 3px; font-weight: bold; color: var(--primary-color); font-size: 0.85rem;">Adicionar Img Fixa (URL):</label>
+                    <input type="text" id="inputImgUrl" placeholder="Cole a URL da imagem aqui...">
+                    <button class="action-btn" style="margin-top: 6px;" onclick="adicionarImagemFixaPorUrl()">Adicionar Imagem</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Modo de Jogo -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-modo')">
+                <span>🎮 Modo de Jogo e IA</span>
+                <span class="arrow" id="arrow-acc-modo">▼</span>
+            </button>
+            <div id="acc-modo" class="accordion-content">
+                <div style="margin-top: 4px;">
+                    <label style="margin-bottom: 3px; font-weight: bold; font-size: 0.85rem;">Modo de Jogo:</label>
+                    <select id="modoJogo" onchange="mudarModoJogo()">
+                        <option value="pvp">2 Jogadores (Local)</option>
+                        <option value="pve">Contra o Computador (IA)</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 6px; display: none;" id="containerDificuldade">
+                    <label style="margin-bottom: 3px; font-weight: bold; font-size: 0.85rem;">Dificuldade da IA:</label>
+                    <select id="dificuldadeIA" onchange="mudarDificuldade()">
+                        <option value="facil">Fácil</option>
+                        <option value="medio">Médio</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="dificil">Difícil (Imprevisível)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Símbolos e Emojis -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-emojis')">
+                <span>✨ Símbolos e Emojis</span>
+                <span class="arrow" id="arrow-acc-emojis">▼</span>
+            </button>
+            <div id="acc-emojis" class="accordion-content">
+                <div style="margin-top: 4px;">
+                    <label style="margin-bottom: 3px; font-weight: bold; font-size: 0.85rem;">Temas de Emojis:</label>
+                    <select id="emojiPreset" onchange="mudarPresetEmoji()">
+                        <option value="❌,⭕">Padrão (❌ / ⭕)</option>
+                        <option value="🐱,🐶">Gato / Cachorro (🐱 / 🐶)</option>
+                        <option value="🍕,🍔">Comida (🍕 / 🍔)</option>
+                        <option value="🔥,💧">Fogo / Água (🔥 / 💧)</option>
+                        <option value="⚡,⭐">Raio / Estrela (⚡ / ⭐)</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 6px;">
+                    <label style="margin-bottom: 3px; font-weight: bold; font-size: 0.85rem;">Personalizar Símbolos:</label>
+                    <div style="display: flex; gap: 8px;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.75rem; opacity: 0.8;">Símbolo X:</span>
+                            <input type="text" id="inputX" value="❌" maxlength="2">
+                        </div>
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.75rem; opacity: 0.8;">Símbolo O:</span>
+                            <input type="text" id="inputO" value="⭕" maxlength="2">
+                        </div>
+                    </div>
+                    <button class="action-btn" style="margin-top: 6px;" onclick="aplicarEmojisPersonalizados()">Aplicar Símbolos</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acordeão: Animações de Fundo -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-anim')">
+                <span>🌌 Animação de Fundo</span>
+                <span class="arrow" id="arrow-acc-anim">▼</span>
+            </button>
+            <div id="acc-anim" class="accordion-content">
+                <button class="action-btn active" id="anim-particles" onclick="mudarAnimacao('particles')">✨ Partículas Neon</button>
+                <button class="action-btn" id="anim-matrix" onclick="mudarAnimacao('matrix')">🌧️ Chuva Digital</button>
+                <button class="action-btn" id="anim-stars" onclick="mudarAnimacao('stars')">⭐ Estrelas Cadentes</button>
+                <button class="action-btn" id="anim-waves" onclick="mudarAnimacao('waves')">🌊 Ondas Fluídas</button>
+                <button class="action-btn" id="anim-off" onclick="mudarAnimacao('off')">❌ Desligada</button>
+            </div>
+        </div>
+
+        <!-- Configuração de Cores RGB -->
+        <div class="menu-section">
+            <div class="color-picker-wrapper">
+                <label for="colorPicker">Cor das Animações:</label>
+                <input type="color" id="colorPicker" value="#00ffcc" onchange="mudarCorCustomizada(this.value)">
+            </div>
+        </div>
+
+        <!-- Acordeão: Paleta de Cores (Temas) -->
+        <div class="menu-section">
+            <button class="accordion-btn" onclick="toggleAccordion('acc-cores')">
+                <span>🎨 Paleta de Cores (Tema)</span>
+                <span class="arrow" id="arrow-acc-cores">▼</span>
+            </button>
+            <div id="acc-cores" class="accordion-content">
+                <button class="action-btn" onclick="mudarTema('cyber')">🌌 Cyber Neon</button>
+                <button class="action-btn" onclick="mudarTema('purple')">🔮 Galáxia Roxa</button>
+                <button class="action-btn" onclick="mudarTema('sakura')">🌸 Sakura (Rosa)</button>
+                <button class="action-btn" onclick="mudarTema('fire')">🔥 Fogo Infernal</button>
+                <button class="action-btn" onclick="mudarTema('minimal')">🖤 Minimalista Escuro</button>
+                <button class="action-btn" onclick="mudarTema('light')">☀️ Claro</button>
+                <!-- 30 Novos Temas -->
+                <button class="action-btn" onclick="mudarTema('nebulosa')">🌌 Nebulosa de Órion</button>
+                <button class="action-btn" onclick="mudarTema('floresta')">🌲 Floresta Mística</button>
+                <button class="action-btn" onclick="mudarTema('tropical')">🌅 Pôr do Sol Tropical</button>
+                <button class="action-btn" onclick="mudarTema('oceano')">🌊 Oceano Profundo</button>
+                <button class="action-btn" onclick="mudarTema('vulcao')">🌋 Vulcão Ativo</button>
+                <button class="action-btn" onclick="mudarTema('cerejeira')">🌸 Cerejeira Noturna</button>
+                <button class="action-btn" onclick="mudarTema('deserto')">🏜️ Deserto Dourado</button>
+                <button class="action-btn" onclick="mudarTema('hacker')">💻 Matriz Hacker</button>
+                <button class="action-btn" onclick="mudarTema('venus')">🪐 Céu de Vênus</button>
+                <button class="action-btn" onclick="mudarTema('artico')">❄️ Inverno Ártico</button>
+                <button class="action-btn" onclick="mudarTema('gotico')">🦇 Gótico Sombrio</button>
+                <button class="action-btn" onclick="mudarTema('retro')">🕹️ Retro Arcade 80s</button>
+                <button class="action-btn" onclick="mudarTema('chocolate')">🍫 Chocolate Quente</button>
+                <button class="action-btn" onclick="mudarTema('mentha')">🌿 Mentha Fresca</button>
+                <button class="action-btn" onclick="mudarTema('lavanda')">💜 Lavanda Suave</button>
+                <button class="action-btn" onclick="mudarTema('ouro')">🪙 Ouro Imperial</button>
+                <button class="action-btn" onclick="mudarTema('cobre')">🟠 Cobre Metálico</button>
+                <button class="action-btn" onclick="mudarTema('ametista')">🔮 Ametista Real</button>
+                <button class="action-btn" onclick="mudarTema('esmeralda')">💎 Esmeralda Brilhante</button>
+                <button class="action-btn" onclick="mudarTema('safira')">🔷 Safira Estrelada</button>
+                <button class="action-btn" onclick="mudarTema('meteoro')">🌠 Chuva de Meteoros</button>
+                <button class="action-btn" onclick="mudarTema('carbono')">🛡️ Carbono Escovado</button>
+                <button class="action-btn" onclick="mudarTema('neonsunset')">🌆 Neon Sunset</button>
+                <button class="action-btn" onclick="mudarTema('halloween')">🎃 Abóbora Halloween</button>
+                <button class="action-btn" onclick="mudarTema('acid')">🧪 Neon Acid</button>
+                <button class="action-btn" onclick="mudarTema('eletrico')">⚡ Azul Elétrico</button>
+                <button class="action-btn" onclick="mudarTema('rosaneon')">💖 Rosa Neon</button>
+                <button class="action-btn" onclick="mudarTema('caribenho')">🏝️ Turquesa Caribenho</button>
+                <button class="action-btn" onclick="mudarTema('bordo')">🍷 Bordô Clássico</button>
+                <button class="action-btn" onclick="mudarTema('tealdark')">🌊 Teal Dark</button>
+            </div>
+        </div>
+
+        <!-- Administração -->
+        <div class="menu-section">
+            <button class="action-btn" onclick="abrirAdminMenu()" style="background: linear-gradient(135deg, #7f00ff, #e100ff);">🛡️ Painel Admin</button>
+        </div>
+    </div>
+
+    <!-- Menu do Top 10 / Ranking Consolidado -->
+    <div id="top10Menu" class="side-menu">
+        <div class="menu-header">
+            <h2>🏆 Top 10 Vitoriosos</h2>
+            <button class="close-icon" onclick="toggleMenu('top10Menu')">✕</button>
+        </div>
+
+        <button class="close-menu-btn" onclick="toggleMenu('top10Menu')">Fechar Menu</button>
+
+        <div class="menu-section" style="margin-top: 5px;">
+            <h3 style="font-size: 0.95rem; color: var(--primary-color);">👥 Jogador vs Jogador (PvP)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Jogador</th>
+                        <th>Vitórias</th>
+                        <th>Derrotas</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingPvPTable">
+                    <tr><td colspan="3">Nenhum jogador registrado</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="menu-section" style="margin-top: 10px;">
+            <h3 style="font-size: 0.95rem; color: var(--secondary-color);">🤖 Jogador vs I.A (PvE)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Jogador</th>
+                        <th>Vitórias</th>
+                        <th>Derrotas</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingPvETable">
+                    <tr><td colspan="3">Nenhum jogador registrado</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Menu do Painel Admin (Protegido por Senha) -->
+    <div id="adminMenu" class="side-menu">
+        <div class="menu-header">
+            <h2>🛡️ Painel Admin</h2>
+            <button class="close-icon" onclick="toggleMenu('adminMenu')">✕</button>
+        </div>
+
+        <button class="close-menu-btn" onclick="toggleMenu('adminMenu')">Fechar Menu</button>
+
+        <div class="menu-section" style="margin-top: 10px;">
+            <p>Painel restrito para controle de placar e redefinições.</p>
+            <div class="menu-options" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <button class="action-btn" style="background: linear-gradient(135deg, #d17500, #ff9900);" onclick="resetarMenu(); toggleMenu('adminMenu');">🔄 Redefinir Menu</button>
+                <button class="action-btn" style="background: linear-gradient(135deg, #ff4d4d, #cc0000);" onclick="zerarPlacar(); toggleMenu('adminMenu');">🗑️ Zerar Placars</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dois Placares Distintos: PvP e PvE -->
+    <div class="placar-container">
+        <div class="placar-box" id="placarPvPDisplay">
+            ⚔️ PvP — <span id="labelNomeX">Jogador 1</span>: 0 | Empates: 0 | <span id="labelNomeO">Jogador 2</span>: 0
+        </div>
+        <div class="placar-box" id="placarPvEDisplay">
+            🤖 PvE — <span id="labelNomeXPvE">Jogador 1</span>: 0 | Empates: 0 | I.A: 0
+        </div>
+    </div>
+
+    <div class="info-container" id="timerContainer">
+        <div>Tempo: <span id="timer">00:00</span></div>
+    </div>
+
+    <div class="status" id="status">Vez do jogador ❌</div>
+
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button class="restart-btn" onclick="reiniciarJogo()">Reiniciar Partida</button>
+
+    <!-- Elementos de Áudio -->
+    <audio id="audioClique" src="https://www.myinstants.com/media/sounds/pop_1.mp3"></audio>
+    <audio id="audioVitoria" src="https://www.myinstants.com/media/sounds/level-win.mp3"></audio>
+    <audio id="musicaFundo" loop src="https://www.bensound.com/bensound-music/bensound-cute.mp3"></audio>
+
+    <script>
+        let SIMBOLO_X = '❌'; 
+        let SIMBOLO_O = '⭕'; 
+        let modoJogo = 'pvp'; 
+        let dificuldadeIA = 'normal';
+
+        let usuarioLogado = localStorage.getItem('tictactoe_usuario_logado') || null;
+        let placarPvP = { x: 0, o: 0, empate: 0 };
+        let placarPvE = { x: 0, o: 0, empate: 0 };
+
+        const cells = document.querySelectorAll('.cell');
+        const statusElement = document.getElementById('status');
+        const timerElement = document.getElementById('timer');
+        const audioClique = document.getElementById('audioClique');
+        const audioVitoria = document.getElementById('audioVitoria');
+        const musicaFundo = document.getElementById('musicaFundo');
+        
+        const timerContainer = document.getElementById('timerContainer');
+        const toggleTimerCheckbox = document.getElementById('toggleTimer');
+        const toggleMusicaCheckbox = document.getElementById('toggleMusica');
+        const colorPicker = document.getElementById('colorPicker');
+        const btnTop10Toggle = document.getElementById('btnTop10Toggle');
+        const btnTop10Icon = document.getElementById('btnTop10Icon');
+        const seletorDispositivo = document.getElementById('seletorDispositivo');
+        const authModal = document.getElementById('authModal');
+
+        let tabuleiro = ['', '', '', '', '', '', '', '', ''];
+        let jogadorAtual = SIMBOLO_X;
+        let jogoAtivo = true;
+
+        let segundos = 0;
+        let minutos = 0;
+        let intervaloTempo = null;
+        let tipoAnimacao = localStorage.getItem('gameAnimType') || 'particles';
+        let top10Ativo = true;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            verificarSessaoUsuario();
+
+            ['particles', 'matrix', 'stars', 'waves', 'off'].forEach(t => {
+                const btn = document.getElementById(`anim-${t}`);
+                if(btn) btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`anim-${tipoAnimacao}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            initAnimationObjects();
+            runAnimation();
+        });
+
+        function verificarSessaoUsuario() {
+            if (!usuarioLogado) {
+                authModal.style.display = 'flex';
+                authModal.classList.remove('hidden');
+            } else {
+                authModal.classList.add('hidden');
+                authModal.style.display = 'none';
+                document.getElementById('nomeJogadorX').value = usuarioLogado;
+                carregarPlacaresUsuario(usuarioLogado);
+                atualizarNomesPlacar();
+            }
+        }
+
+        function processarAutenticacao() {
+            const user = document.getElementById('inputAuthUser').value.trim();
+            const pass = document.getElementById('inputAuthPass').value.trim();
+
+            if (!user || !pass) {
+                alert('Por favor, preencha o nome de usuário e a senha.');
+                return;
+            }
+
+            let bancoContas = JSON.parse(localStorage.getItem('tictactoe_contas')) || {};
+
+            if (bancoContas[user]) {
+                if (bancoContas[user] === pass) {
+                    usuarioLogado = user;
+                    localStorage.setItem('tictactoe_usuario_logado', user);
+                    verificarSessaoUsuario();
+                } else {
+                    alert('Senha incorreta para este usuário!');
+                }
+            } else {
+                bancoContas[user] = pass;
+                localStorage.setItem('tictactoe_contas', JSON.stringify(bancoContas));
+                usuarioLogado = user;
+                localStorage.setItem('tictactoe_usuario_logado', user);
+                verificarSessaoUsuario();
+            }
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('tictactoe_usuario_logado');
+            usuarioLogado = null;
+            document.getElementById('inputAuthUser').value = '';
+            document.getElementById('inputAuthPass').value = '';
+            verificarSessaoUsuario();
+            toggleMenu('mainMenu');
+        }
+
+        function carregarPlacaresUsuario(user) {
+            placarPvP = JSON.parse(localStorage.getItem(`tictactoe_placar_pvp_${user}`)) || { x: 0, o: 0, empate: 0 };
+            placarPvE = JSON.parse(localStorage.getItem(`tictactoe_placar_pve_${user}`)) || { x: 0, o: 0, empate: 0 };
+        }
+
+        function salvarPlacaresUsuario() {
+            if (!usuarioLogado) return;
+            localStorage.setItem(`tictactoe_placar_pvp_${usuarioLogado}`, JSON.stringify(placarPvP));
+            localStorage.setItem(`tictactoe_placar_pve_${usuarioLogado}`, JSON.stringify(placarPvE));
+        }
+
+        // Canvas de Animações
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let particles = [];
+        let drops = [];
+        let stars = [];
+        let waveAngles = [0, 0, 0, 0];
+
+        function initAnimationObjects() {
+            particles = [];
+            for(let i=0; i<25; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 3 + 1,
+                    speedY: (Math.random() * 1 + 0.5) * -1,
+                    alpha: Math.random() * 0.5 + 0.1
+                });
+            }
+
+            drops = [];
+            const cols = Math.floor(canvas.width / 35);
+            for(let i=0; i<cols; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height);
+            }
+
+            stars = [];
+            for(let i=0; i<30; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: Math.random() * 2 + 1,
+                    alpha: Math.random()
+                });
+            }
+        }
+
+        function runAnimation() {
+            cancelAnimationFrame(animationFrameId);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const computedColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#00ffcc';
+
+            if (tipoAnimacao === 'particles') {
+                ctx.fillStyle = computedColor;
+                particles.forEach(p => {
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    p.y += p.speedY;
+                    if(p.y < 0) p.y = canvas.height;
+                });
+            } else if (tipoAnimacao === 'matrix') {
+                ctx.fillStyle = computedColor;
+                ctx.font = 'bold 28px monospace';
+                ctx.globalAlpha = 0.45;
+                const simbolosChuva = ['❌', '⭕', '⚡', '⭐', '🔥', '0', '1'];
+                drops.forEach((y, index) => {
+                    const text = simbolosChuva[Math.floor(Math.random() * simbolosChuva.length)];
+                    const x = index * 35;
+                    ctx.fillText(text, x, y);
+                    if(y > canvas.height && Math.random() > 0.975) drops[index] = 0;
+                    drops[index] += 25;
+                });
+            } else if (tipoAnimacao === 'stars') {
+                ctx.fillStyle = computedColor;
+                stars.forEach(s => {
+                    ctx.globalAlpha = s.alpha;
+                    ctx.fillRect(s.x, s.y, s.size, s.size);
+                    s.x -= s.speedX;
+                    if(s.x < 0) s.x = canvas.width;
+                });
+            } else if (tipoAnimacao === 'waves') {
+                const configsOndas = [
+                    { freq: 0.008, amp: 50, speed: 0.02, alpha: 0.15, offset: canvas.height * 0.3 },
+                    { freq: 0.012, amp: 35, speed: 0.035, alpha: 0.25, offset: canvas.height * 0.5 },
+                    { freq: 0.006, amp: 65, speed: 0.015, alpha: 0.1, offset: canvas.height * 0.7 },
+                    { freq: 0.015, amp: 25, speed: 0.045, alpha: 0.3, offset: canvas.height * 0.85 }
+                ];
+
+                configsOndas.forEach((cfg, idx) => {
+                    ctx.strokeStyle = computedColor;
+                    ctx.lineWidth = 2.5;
+                    ctx.globalAlpha = cfg.alpha;
+                    ctx.beginPath();
+                    for(let x = 0; x < canvas.width; x += 15) {
+                        let y = cfg.offset + Math.sin(x * cfg.freq + waveAngles[idx]) * cfg.amp;
+                        if(x === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    waveAngles[idx] += cfg.speed;
+                });
+            }
+
+            if (tipoAnimacao !== 'off') {
+                animationFrameId = requestAnimationFrame(runAnimation);
+            }
+        }
+
+        function mudarAnimacao(tipo) {
+            tipoAnimacao = tipo;
+            localStorage.setItem('gameAnimType', tipo);
+
+            ['particles', 'matrix', 'stars', 'waves', 'off'].forEach(t => {
+                const btn = document.getElementById(`anim-${t}`);
+                if(btn) btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`anim-${tipo}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            initAnimationObjects();
+            runAnimation();
+        }
+
+        function mudarCorCustomizada(corHex) {
+            document.documentElement.style.setProperty('--primary-color', corHex);
+            localStorage.setItem('gameCustomColor', corHex);
+            runAnimation();
+        }
+
+        const savedCustomColor = localStorage.getItem('gameCustomColor');
+        if (savedCustomColor) {
+            document.documentElement.style.setProperty('--primary-color', savedCustomColor);
+            colorPicker.value = savedCustomColor;
+        }
+
+        function mudarDispositivo(tipo) {
+            document.body.classList.remove('device-desktop', 'device-tablet', 'device-mobile');
+            if (tipo !== 'auto') {
+                document.body.classList.add(`device-${tipo}`);
+            }
+            localStorage.setItem('gameDeviceMode', tipo);
+        }
+
+        const savedDeviceMode = localStorage.getItem('gameDeviceMode');
+        if (savedDeviceMode) {
+            seletorDispositivo.value = savedDeviceMode;
+            mudarDispositivo(savedDeviceMode);
+        }
+
+        function toggleTop10Feature() {
+            top10Ativo = !top10Ativo;
+            if (top10Ativo) {
+                btnTop10Toggle.classList.add('active');
+                btnTop10Toggle.textContent = "🏆 Top 10: Habilitado";
+                btnTop10Icon.style.display = 'flex';
+            } else {
+                btnTop10Toggle.classList.remove('active');
+                btnTop10Toggle.textContent = "🏆 Top 10: Desabilitado";
+                btnTop10Icon.style.display = 'none';
+                document.getElementById('top10Menu').classList.remove('open');
+            }
+            localStorage.setItem('gameTop10', top10Ativo);
+        }
+
+        const savedTop10 = localStorage.getItem('gameTop10');
+        if (savedTop10 !== null) {
+            top10Ativo = (savedTop10 === 'true');
+            if (!top10Ativo) {
+                btnTop10Toggle.classList.remove('active');
+                btnTop10Toggle.textContent = "🏆 Top 10: Desabilitado";
+                btnTop10Icon.style.display = 'none';
+            }
+        }
+
+        const condicoesVitoria = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        atualizarPlacarDisplay();
+        atualizarTabelaRankingConsolidado();
+        iniciarTempo();
+
+        cells.forEach((cell) => {
+            cell.addEventListener('click', lidarComClique);
+        });
+
+        function toggleMenu(menuId) {
+            document.querySelectorAll('.side-menu').forEach(menu => {
+                if (menu.id !== menuId) menu.classList.remove('open');
+            });
+            document.getElementById(menuId).classList.toggle('open');
+        }
+
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const arrow = document.getElementById('arrow-' + id);
+            content.classList.toggle('open');
+            if (content.classList.contains('open')) {
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function abrirAdminMenu() {
+            const senha = prompt("Digite a senha de administrador:");
+            if (senha === "Everton1002!") {
+                toggleMenu('adminMenu');
+            } else if (senha !== null) {
+                alert("Senha incorreta!");
+            }
+        }
+
+        function atualizarNomesPlacar() {
+            const nomeX = usuarioLogado || 'Jogador 1';
+            const nomeO = document.getElementById('nomeJogadorO').value.trim() || 'Jogador 2';
+            document.getElementById('labelNomeX').textContent = nomeX;
+            document.getElementById('labelNomeO').textContent = nomeO;
+            document.getElementById('labelNomeXPvE').textContent = nomeX;
+            atualizarPlacarDisplay();
+            atualizarTabelaRankingConsolidado();
+        }
+
+        function adicionarImagemFixaPorUrl() {
+            const url = document.getElementById('inputImgUrl').value.trim();
+            if (!url) {
+                alert('Por favor, insira uma URL de imagem válida.');
+                return;
+            }
+
+            const container = document.getElementById('customImagesContainer');
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'custom-fixed-img';
+
+            const posX = Math.random() < 0.5 ? Math.random() * 20 : Math.random() * 20 + 75;
+            const posY = Math.random() * 75 + 10;
+            img.style.left = posX + '%';
+            img.style.top = posY + '%';
+
+            container.appendChild(img);
+            document.getElementById('inputImgUrl').value = '';
+            toggleMenu('mainMenu');
+        }
+
+        function atualizarPlacarDisplay() {
+            const nomeX = usuarioLogado || 'Jogador 1';
+            const nomeO = document.getElementById('nomeJogadorO').value.trim() || 'Jogador 2';
+            
+            document.getElementById('placarPvPDisplay').innerHTML = `⚔️ PvP — ${nomeX} (${SIMBOLO_X}): ${placarPvP.x} | Empates: ${placarPvP.empate} | ${nomeO} (${SIMBOLO_O}): ${placarPvP.o}`;
+            document.getElementById('placarPvEDisplay').innerHTML = `🤖 PvE — ${nomeX} (${SIMBOLO_X}): ${placarPvE.x} | Empates: ${placarPvE.empate} | I.A (${SIMBOLO_O}): ${placarPvE.o}`;
+        }
+
+        function atualizarTabelaRankingConsolidado() {
+            if (!top10Ativo) return;
+
+            const pvpTable = document.getElementById('rankingPvPTable');
+            const pveTable = document.getElementById('rankingPvETable');
+
+            const nomeX = usuarioLogado || 'Jogador 1';
+            const nomeO = document.getElementById('nomeJogadorO').value.trim() || 'Jogador 2';
+
+            pvpTable.innerHTML = `
+                <tr>
+                    <td style="font-weight: bold; color: var(--primary-color);">${nomeX}</td>
+                    <td>${placarPvP.x}</td>
+                    <td>${placarPvP.o}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; color: var(--secondary-color);">${nomeO}</td>
+                    <td>${placarPvP.o}</td>
+                    <td>${placarPvP.x}</td>
+                </tr>
+            `;
+
+            pveTable.innerHTML = `
+                <tr>
+                    <td style="font-weight: bold; color: var(--primary-color);">${nomeX}</td>
+                    <td>${placarPvE.x}</td>
+                    <td>${placarPvE.o}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; color: var(--secondary-color);">Computador (IA)</td>
+                    <td>${placarPvE.o}</td>
+                    <td>${placarPvE.x}</td>
+                </tr>
+            `;
+        }
+
+        function zerarPlacar() {
+            placarPvP = { x: 0, o: 0, empate: 0 };
+            placarPvE = { x: 0, o: 0, empate: 0 };
+            salvarPlacaresUsuario();
+            atualizarPlacarDisplay();
+            atualizarTabelaRankingConsolidado();
+            alert("Placar da conta atual zerado com sucesso!");
+        }
+
+        function resetarMenu() {
+            toggleTimerCheckbox.checked = true;
+            mudarTimer();
+
+            toggleMusicaCheckbox.checked = false;
+            mudarMusica();
+
+            document.getElementById('modoJogo').value = 'pvp';
+            mudarModoJogo();
+            document.getElementById('dificuldadeIA').value = 'normal';
+            mudarDificuldade();
+
+            seletorDispositivo.value = 'auto';
+            mudarDispositivo('auto');
+
+            document.getElementById('emojiPreset').value = '❌,⭕';
+            document.getElementById('inputX').value = '❌';
+            document.getElementById('inputO').value = '⭕';
+            SIMBOLO_X = '❌';
+            SIMBOLO_O = '⭕';
+
+            document.getElementById('nomeJogadorO').value = 'Adversário';
+            atualizarNomesPlacar();
+
+            document.getElementById('customImagesContainer').innerHTML = '';
+            document.getElementById('inputImgUrl').value = '';
+
+            mudarTema('cyber');
+            atualizarPlacarDisplay();
+            toggleMenu('mainMenu');
+        }
+
+        function mudarModoJogo() {
+            modoJogo = document.getElementById('modoJogo').value;
+            const containerDif = document.getElementById('containerDificuldade');
+            const nomeOInput = document.getElementById('nomeJogadorO');
+            if (modoJogo === 'pve') {
+                containerDif.style.display = 'block';
+                nomeOInput.value = 'Computador (IA)';
+                nomeOInput.disabled = true;
+            } else {
+                containerDif.style.display = 'none';
+                nomeOInput.value = 'Adversário';
+                nomeOInput.disabled = false;
+            }
+            atualizarNomesPlacar();
+            reiniciarJogo();
+        }
+
+        function mudarDificuldade() {
+            dificuldadeIA = document.getElementById('dificuldadeIA').value;
+        }
+
+        function mudarPresetEmoji() {
+            const select = document.getElementById('emojiPreset');
+            const [valX, valO] = select.value.split(',');
+            
+            SIMBOLO_X = valX;
+            SIMBOLO_O = valO;
+
+            document.getElementById('inputX').value = valX;
+            document.getElementById('inputO').value = valO;
+
+            atualizarPlacarDisplay();
+            reiniciarJogo();
+        }
+
+        function aplicarEmojisPersonalizados() {
+            const valX = document.getElementById('inputX').value.trim();
+            const valO = document.getElementById('inputO').value.trim();
+
+            if (!valX || !valO) {
+                alert('Por favor, preencha os símbolos para ambos os jogadores.');
+                return;
+            }
+
+            SIMBOLO_X = valX;
+            SIMBOLO_O = valO;
+
+            atualizarPlacarDisplay();
+            reiniciarJogo();
+            toggleMenu('mainMenu');
+        }
+
+        function mudarTema(tema) {
+            document.body.classList.remove(
+                'theme-purple', 'theme-sakura', 'theme-fire', 'theme-minimal', 'theme-light',
+                'theme-nebulosa', 'theme-floresta', 'theme-tropical', 'theme-oceano', 'theme-vulcao',
+                'theme-cerejeira', 'theme-deserto', 'theme-hacker', 'theme-venus', 'theme-artico',
+                'theme-gotico', 'theme-retro', 'theme-chocolate', 'theme-mentha', 'theme-lavanda',
+                'theme-ouro', 'theme-cobre', 'theme-ametista', 'theme-esmeralda', 'theme-safira',
+                'theme-meteoro', 'theme-carbono', 'theme-neonsunset', 'theme-halloween', 'theme-acid',
+                'theme-eletrico', 'theme-rosaneon', 'theme-caribenho', 'theme-bordo', 'theme-tealdark'
+            );
+            
+            if (tema !== 'cyber') {
+                document.body.classList.add(`theme-${tema}`);
+            }
+            
+            const novaCor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+            colorPicker.value = novaCor;
+            localStorage.setItem('gameTheme', tema);
+            runAnimation();
+        }
+
+        const savedTheme = localStorage.getItem('gameTheme');
+        if (savedTheme) mudarTema(savedTheme);
+
+        function mudarTimer() {
+            if (toggleTimerCheckbox.checked) {
+                timerContainer.classList.remove('hidden');
+                if (jogoAtivo) iniciarTempo();
+            } else {
+                timerContainer.classList.add('hidden');
+                pararTimer();
+            }
+        }
+
+        function mudarMusica() {
+            if (toggleMusicaCheckbox.checked) {
+                musicaFundo.volume = 0.3;
+                musicaFundo.play().catch(() => {});
+            } else {
+                musicaFundo.pause();
+            }
+        }
+
+        function iniciarTempo() {
+            pararTimer();
+            if (toggleTimerCheckbox && !toggleTimerCheckbox.checked) return;
+            segundos = 0;
+            minutos = 0;
+            atualizarDisplayTempo();
+            intervaloTempo = setInterval(() => {
+                segundos++;
+                if (segundos === 60) {
+                    segundos = 0;
+                    minutos++;
+                }
+                atualizarDisplayTempo();
+            }, 1000);
+        }
+
+        function pararTimer() {
+            clearInterval(intervaloTempo);
+        }
+
+        function atualizarDisplayTempo() {
+            let minFormatado = minutos < 10 ? '0' + minutos : minutos;
+            let segFormatado = segundos < 10 ? '0' + segundos : segundos;
+            if (timerElement) {
+                timerElement.innerHTML = `${minFormatado}:${segFormatado}`;
+            }
+        }
+
+        function lidarComClique(e) {
+            if (modoJogo === 'pve' && jogadorAtual === SIMBOLO_O) return;
+
+            const celulaClicada = e.currentTarget;
+            const index = celulaClicada.getAttribute('data-index');
+
+            if (tabuleiro[index] !== '' || !jogoAtivo) return;
+
+            if (audioClique) {
+                audioClique.currentTime = 0;
+                audioClique.play().catch(() => {});
+            }
+
+            tabuleiro[index] = jogadorAtual;
+            celulaClicada.innerHTML = jogadorAtual;
+
+            verificarFimDeJogo();
+        }
+
+        function jogadaIA() {
+            if (!jogoAtivo || jogadorAtual !== SIMBOLO_O || modoJogo !== 'pve') return;
+
+            setTimeout(() => {
+                if (!jogoAtivo) return;
+                let movimento = null;
+
+                if (dificuldadeIA === 'facil') {
+                    let vazias = [];
+                    tabuleiro.forEach((val, idx) => { if (val === '') vazias.push(idx); });
+                    if (vazias.length > 0) {
+                        movimento = vazias[Math.floor(Math.random() * vazias.length)];
+                    }
+                } 
+                else if (dificuldadeIA === 'medio') {
+                    if (Math.random() < 0.5) {
+                        let vazias = [];
+                        tabuleiro.forEach((val, idx) => { if (val === '') vazias.push(idx); });
+                        movimento = vazias[Math.floor(Math.random() * vazias.length)];
+                    } else {
+                        movimento = encontrarMelhorMovimento(SIMBOLO_O);
+                        if (movimento === null) movimento = encontrarMelhorMovimento(SIMBOLO_X);
+                        if (movimento === null) {
+                            let vazias = [];
+                            tabuleiro.forEach((val, idx) => { if (val === '') vazias.push(idx); });
+                            movimento = vazias[Math.floor(Math.random() * vazias.length)];
+                        }
+                    }
+                } 
+                else if (dificuldadeIA === 'normal') {
+                    movimento = encontrarMelhorMovimento(SIMBOLO_O);
+                    if (movimento === null) movimento = encontrarMelhorMovimento(SIMBOLO_X);
+                    if (movimento === null && tabuleiro[4] === '') movimento = 4;
+                    if (movimento === null) {
+                        let vazias = [];
+                        tabuleiro.forEach((val, idx) => { if (val === '') vazias.push(idx); });
+                        movimento = vazias[Math.floor(Math.random() * vazias.length)];
+                    }
+                } 
+                else if (dificuldadeIA === 'dificil') {
+                    movimento = encontrarMelhorMovimento(SIMBOLO_O);
+                    if (movimento === null) {
+                        movimento = encontrarMelhorMovimento(SIMBOLO_X);
+                    }
+                    if (movimento === null) {
+                        let vazias = [];
+                        tabuleiro.forEach((val, idx) => { if (val === '') vazias.push(idx); });
+
+                        if (tabuleiro[4] === '' && Math.random() < 0.75) {
+                            movimento = 4;
+                        } else {
+                            let cantosDiagonais = [0, 2, 6, 8].filter(idx => tabuleiro[idx] === '');
+                            if (cantosDiagonais.length > 0 && Math.random() < 0.8) {
+                                movimento = cantosDiagonais[Math.floor(Math.random() * cantosDiagonais.length)];
+                            } else if (vazias.length > 0) {
+                                movimento = vazias[Math.floor(Math.random() * vazias.length)];
+                            }
+                        }
+                    }
+                }
+
+                if (movimento !== null && tabuleiro[movimento] === '') {
+                    tabuleiro[movimento] = SIMBOLO_O;
+                    cells[movimento].innerHTML = SIMBOLO_O;
+                    if (audioClique) {
+                        audioClique.currentTime = 0;
+                        audioClique.play().catch(() => {});
+                    }
+                    verificarFimDeJogo();
+                }
+            }, 500);
+        }
+
+        function encontrarMelhorMovimento(simbolo) {
+            for (let i = 0; i < condicoesVitoria.length; i++) {
+                const [a, b, c] = condicoesVitoria[i];
+                let linha = [tabuleiro[a], tabuleiro[b], tabuleiro[c]];
+                let vazios = linha.filter(val => val === '').length;
+                let iguais = linha.filter(val => val === simbolo).length;
+
+                if (iguais === 2 && vazios === 1) {
+                    if (tabuleiro[a] === '') return a;
+                    if (tabuleiro[b] === '') return b;
+                    if (tabuleiro[c] === '') return c;
+                }
+            }
+            return null;
+        }
+
+        function verificarFimDeJogo() {
+            let venceu = false;
+            let linhaVencedora = null;
+
+            for (let i = 0; i < condicoesVitoria.length; i++) {
+                const [a, b, c] = condicoesVitoria[i];
+                if (tabuleiro[a] && tabuleiro[a] === tabuleiro[b] && tabuleiro[a] === tabuleiro[c]) {
+                    venceu = true;
+                    linhaVencedora = [a, b, c];
+                    break;
+                }
+            }
+
+            const nomeX = usuarioLogado || 'Jogador 1';
+            const nomeO = document.getElementById('nomeJogadorO').value.trim() || 'Jogador 2';
+
+            if (venceu) {
+                pararTimer();
+                if (audioVitoria) {
+                    audioVitoria.currentTime = 0;
+                    audioVitoria.play().catch(() => {});
+                }
+
+                linhaVencedora.forEach(idx => {
+                    cells[idx].classList.add('winner-cell');
+                });
+
+                const vencedorNome = (jogadorAtual === SIMBOLO_X) ? nomeX : nomeO;
+
+                if (modoJogo === 'pvp') {
+                    if (jogadorAtual === SIMBOLO_X) {
+                        placarPvP.x++;
+                    } else {
+                        placarPvP.o++;
+                    }
+                } else {
+                    if (jogadorAtual === SIMBOLO_X) {
+                        placarPvE.x++;
+                    } else {
+                        placarPvE.o++;
+                    }
+                }
+
+                salvarPlacaresUsuario();
+                atualizarPlacarDisplay();
+                atualizarTabelaRankingConsolidado();
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                }
+
+                statusElement.innerHTML = `Fim de jogo! ${vencedorNome} venceu! 🎉`;
+                jogoAtivo = false;
+                return;
+            }
+
+            if (!tabuleiro.includes('')) {
+                pararTimer();
+                if (modoJogo === 'pvp') {
+                    placarPvP.empate++;
+                } else {
+                    placarPvE.empate++;
+                }
+                salvarPlacaresUsuario();
+                atualizarPlacarDisplay();
+
+                statusElement.innerHTML = `Deu velha! Empate! 🤝`;
+                jogoAtivo = false;
+                return;
+            }
+
+            jogadorAtual = (jogadorAtual === SIMBOLO_X) ? SIMBOLO_O : SIMBOLO_X;
+            const proximoNome = (jogadorAtual === SIMBOLO_X) ? nomeX : nomeO;
+            statusElement.innerHTML = `Vez de ${proximoNome} (${jogadorAtual})`;
+
+            if (modoJogo === 'pve' && jogadorAtual === SIMBOLO_O && jogoAtivo) {
+                jogadaIA();
+            }
+        }
+
+        function reiniciarJogo() {
+            tabuleiro = ['', '', '', '', '', '', '', '', ''];
+            jogoAtivo = true;
+            jogadorAtual = SIMBOLO_X;
+            const nomeX = usuarioLogado || 'Jogador 1';
+            statusElement.innerHTML = `Vez de ${nomeX} (${SIMBOLO_X})`;
+            cells.forEach(cell => {
+                cell.innerHTML = '';
+                cell.classList.remove('winner-cell');
+            });
+            iniciarTempo();
+        }
+    </script>
+</body>
+</html>
